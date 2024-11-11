@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기술-케이프 [50래빗 무료!]</title>
+  <style>
+    /* 기본 배경 설정 */
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center; 
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcGWK3U%2FbtsKEH8h3PC%2FnHsiILC1sGbfKdUsZXbV31%2Fimg.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* 컨테이너 스타일 */
+    #quiz-container, #end-screen, #start-screen, #bonus-screen, #final-screen {
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      width: 400px;
+      padding: 20px;
+      margin: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      display: none;
+    }
+
+    h2 { color: #333; margin-bottom: 10px; font-size: 24px; }
+    #question { font-size: 18px; margin-bottom: 20px; color: #444; }
+
+    .choice {
+      background-color: #e0e4f1;
+      color: #333;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 5px;
+      margin: 5px 0;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .choice:hover { background-color: #d0d6ea; }
+    .choice:disabled { background-color: #cccccc; cursor: not-allowed; }
+
+    .correct { color: green; font-weight: bold; }
+    .incorrect { color: red; font-weight: bold; }
+
+/* 이름 입력 칸과 단답형 입력 칸 스타일 추가 */
+    #name-input, #short-answer {
+      width: 80%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      margin: 10px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #name-input:focus, #short-answer:focus {
+      border-color: #00B6FF;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0, 128, 0, 0.2);
+    }
+
+    #feedback { margin-top: 10px; font-size: 16px; }
+
+
+    #feedback { margin-top: 10px; font-size: 16px; }
+    #next-button, #roll-dice-button, #proceed-button {
+      background-color: #00B6FF;
+      color: white;
+      width: 70%;
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    #next-button:hover, #roll-dice-button:hover, #proceed-button:hover { background-color: #00B6FF; }
+    #score { font-weight: bold; color: #333; }
+    #timer { font-size: 14px; color: red; font-weight: bold; margin-top: 10px; }
+    #start-button, #final-button {
+      background-color: #00B6FF;
+      color: white;
+      width: 70%;
+      justify-content: center;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+
+    }
+
+  /* 제출 버튼 스타일 */
+    #submit-button {
+      background-color: #00B6FF;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+
+
+    #start-button:hover, #final-button:hover { background-color: #00B6FF; }
+  </style>
+</head>
+<body>
+
+  <!-- 시작 화면 -->
+  <div id="start-screen">
+    <h2>기술-케이프 [50래빗 무료!]</h2>
+    <p>~다섯 개의 방과 주사위 미션~</p>
+    <input type="text" id="name-input" placeholder="이름을 입력하고 탈출 시~작!">
+    <button id="start-button" disabled>입장!</button>
+  </div>
+
+  <!-- 퀴즈 화면 -->
+  <div id="quiz-container">
+    <h2>랜덤 퀴즈 방!</h2>
+    <p id="question"></p>
+    <div id="choices"></div>
+    <p id="feedback"></p>
+    <p id="timer"></p>
+    <button id="next-button">다음 문제!</button>
+    <p>지나온 방 수: <span id="score">0</span>/5</p>
+  </div>
+
+
+    <!-- 단답형 입력란과 제출 버튼 -->
+    <div class="input-container" style="display:none" id="short-answer-container">
+      <input type="text" id="short-answer" placeholder="정답은 이쪽에 입력!">
+      <button id="submit-button">제출!</button>
+    </div>
+
+
+
+  <!-- 마지막 화면 -->
+  <div id="end-screen">
+    <h2>C O N G R A T U L A T I O N !</h2>
+    <p>모든 방을 탈출! 이제 마지막 미션만 남았어!</p>
+    <button id="final-button">주사위 데구르르</button>
+  </div>
+
+  <!-- 주사위 미션 화면 -->
+  <div id="bonus-screen">
+    <h2>주사위 미션</h2>
+    <p id="bonus-question">이 문제를 풀려면 주사위를 굴려야 합니다!</p>
+    <p>주사위를 굴려서, <span id="required-number">50</span> 이상 나오면 성공!</p>
+    <button id="roll-dice-button">주사위 데굴데굴</button>
+    <p id="dice-result"></p>
+    <p id="bonus-timer"></p>
+    <button id="proceed-button" style="display: none;">마지막 안내는 이쪽!</button>
+  </div>
+
+  <!-- 최종 화면 -->
+  <div id="final-screen">
+    <h2>마지막까지 고생했어!</h2>
+    <p id="final-message"></p>
+  </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    let userName = "";
+    let startTime = "";
+    let bonusSuccessTime = "";
+
+    document.getElementById("name-input").addEventListener("input", () => {
+      const nameInput = document.getElementById("name-input").value.trim();
+      document.getElementById("start-button").disabled = !nameInput;
+    });
+
+    document.getElementById("start-button").addEventListener("click", () => {
+      userName = document.getElementById("name-input").value.trim();
+      startTime = new Date().toLocaleString();
+      showQuizScreen();
+    });
+
+    const mainQuestions = [
+      { question: "객관식 문제 1", choices: ["보기 1", "보기 2", "보기 3", "정답"], answer: 3 },
+      { question: "객관식 문제 2", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      { question: "객관식 문제 3", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
+      // ... 총 29개의 문제
+    ];
+
+    const finalQuestions = [
+      { question: "루루 3세 문제 1", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
+      { question: "루루 3세 문제 2", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
+      { question: "루루 3세 문제 3", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      // ... 총 10개의 마지막 문제
+    ];
+
+    const shortAnswerQuestion = [
+      { question: "단답형 문제 1", answer: "정답1" },
+      { question: "단답형 문제 2", answer: "정답2" },
+      // ... 총 10개의 단답형 문제
+    ];
+
+    let score = 0;
+    let currentQuestion = null;
+    let penaltyTimer = null;
+    let penaltyTimeLeft = 10;
+
+    function getRandomQuestion() {
+      if (score < 3) {
+        return mainQuestions[Math.floor(Math.random() * mainQuestions.length)];
+      } else if (score === 3) {
+        return shortAnswerQuestion[Math.floor(Math.random() * shortAnswerQuestion.length)];
+      } else {
+        return finalQuestions[Math.floor(Math.random() * finalQuestions.length)];
+      }
+    }
+
+    function showQuestion() {
+      document.getElementById("feedback").innerText = "";
+      document.getElementById("timer").innerText = "";
+      document.getElementById("next-button").style.display = "none";
+
+      currentQuestion = getRandomQuestion();
+      document.getElementById("question").innerText = currentQuestion.question;
+
+      const choicesDiv = document.getElementById("choices");
+      choicesDiv.innerHTML = ""; // 초기화
+
+      if (currentQuestion.choices) {
+        currentQuestion.choices.forEach((choice, index) => {
+          const button = document.createElement("button");
+          button.classList.add("choice");
+          button.innerText = choice;
+          button.onclick = () => checkAnswer(index);
+          choicesDiv.appendChild(button);
+        });
+      } else {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.id = "short-answer";
+        input.placeholder = "정답은 이쪽에!";
+        choicesDiv.appendChild(input);
+
+        const submitButton = document.createElement("button");
+        submitButton.innerText = "제출";
+        submitButton.id = "submit-button";
+        submitButton.onclick = () => checkShortAnswer();
+        choicesDiv.appendChild(submitButton);
+      }
+    }
+
+    function checkAnswer(selectedIndex) {
+      if (selectedIndex === currentQuestion.answer) {
+        document.getElementById("feedback").innerText = "정답!";
+        document.getElementById("feedback").classList = "correct";
+        score++;
+        document.getElementById("score").innerText = score;
+        disableChoices(true);
+
+        if (score >= 5) {
+          showEndScreen();
+        } else {
+          document.getElementById("next-button").style.display = "block";
+        }
+      } else {
+        document.getElementById("feedback").innerText = "삐빅, 오답! 10초 패널티!";
+        document.getElementById("feedback").classList = "incorrect";
+        startPenalty();
+      }
+    }
+
+    function checkShortAnswer() {
+      const userAnswer = document.getElementById("short-answer").value.trim();
+      if (userAnswer === currentQuestion.answer) {
+        document.getElementById("feedback").innerText = "딩동댕!";
+        document.getElementById("feedback").classList = "correct";
+        score++;
+        document.getElementById("score").innerText = score;
+        document.getElementById("next-button").style.display = "block";
+      } else {
+        document.getElementById("feedback").innerText = "땡! 10초 패널티야!";
+        document.getElementById("feedback").classList = "incorrect";
+        startPenalty();
+      }
+    }
+
+    function startPenalty() {
+      disableChoices(true);
+      penaltyTimeLeft = 10;
+      updateTimer();
+
+      penaltyTimer = setInterval(() => {
+        penaltyTimeLeft--;
+        updateTimer();
+
+        if (penaltyTimeLeft <= 0) {
+          clearInterval(penaltyTimer);
+          disableChoices(false);
+          document.getElementById("timer").innerText = "";
+          document.getElementById("feedback").innerText = "";
+        }
+      }, 1000);
+    }
+
+    function updateTimer() {
+      document.getElementById("timer").innerText = `남은 시간: ${penaltyTimeLeft}초`;
+    }
+
+    function disableChoices(disable) {
+      const buttons = document.querySelectorAll(".choice, #short-answer, #submit-button");
+      buttons.forEach(button => button.disabled = disable);
+    }
+
+    function showStartScreen() {
+      document.getElementById("start-screen").style.display = "block";
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("end-screen").style.display = "none";
+    }
+
+    function showQuizScreen() {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("quiz-container").style.display = "block";
+      document.getElementById("end-screen").style.display = "none";
+      score = 0;
+      document.getElementById("score").innerText = score;
+      showQuestion();
+    }
+
+    function showEndScreen() {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("end-screen").style.display = "block";
+    }
+
+    // 미션 추가
+    const bonusQuestions = [
+      { question: "미션 1", requiredRoll: 50 },
+      { question: "미션 2", requiredRoll: 50 },
+      { question: "미션 3", requiredRoll: 50 },
+      { question: "미션 4", requiredRoll: 50 },
+      { question: "미션 5", requiredRoll: 50 },
+    ];
+    let currentBonusQuestion = null;
+    let bonusPenaltyTimer = null;
+    let bonusPenaltyTimeLeft = 10;
+
+    function getRandomBonusQuestion() {
+      return bonusQuestions[Math.floor(Math.random() * bonusQuestions.length)];
+    }
+
+    function showBonusScreen() {
+      document.getElementById("end-screen").style.display = "none";
+      document.getElementById("bonus-screen").style.display = "block";
+
+      currentBonusQuestion = getRandomBonusQuestion();
+      document.getElementById("bonus-question").innerText = currentBonusQuestion.question;
+      document.getElementById("required-number").innerText = currentBonusQuestion.requiredRoll;
+      document.getElementById("dice-result").innerText = "";
+      document.getElementById("roll-dice-button").disabled = false;
+      document.getElementById("proceed-button").style.display = "none";
+    }
+
+    function rollDice() {
+      const rollResult = Math.floor(Math.random() * 100) + 1;
+      document.getElementById("dice-result").innerText = `주사위 결과: ${rollResult}`;
+
+      if (rollResult >= currentBonusQuestion.requiredRoll) {
+        document.getElementById("dice-result").innerText += " ::: 성공!\n탈출 성공이야!";
+        document.getElementById("roll-dice-button").style.display = "none";
+        document.getElementById("proceed-button").style.display = "block";
+        bonusSuccessTime = new Date().toLocaleString();
+      } else {
+        document.getElementById("dice-result").innerText += " ::: 실패!\n10초 패널티!";
+        startBonusPenalty();
+      }
+    }
+
+    function startBonusPenalty() {
+      document.getElementById("roll-dice-button").disabled = true;
+      bonusPenaltyTimeLeft = 10;
+      updateBonusTimer();
+
+      bonusPenaltyTimer = setInterval(() => {
+        bonusPenaltyTimeLeft--;
+        updateBonusTimer();
+
+        if (bonusPenaltyTimeLeft <= 0) {
+          clearInterval(bonusPenaltyTimer);
+          document.getElementById("roll-dice-button").disabled = false;
+          document.getElementById("bonus-timer").innerText = "";
+        }
+      }, 1000);
+    }
+
+    function updateBonusTimer() {
+      document.getElementById("bonus-timer").innerText = `남은 시간: ${bonusPenaltyTimeLeft}초`;
+    }
+
+    function showFinalScreen() {
+      document.getElementById("bonus-screen").style.display = "none";
+      document.getElementById("final-screen").style.display = "block";
+      document.getElementById("final-message").innerText = `${userName}의 최종 기록은!\n\n입장 시각: ${startTime}\n탈출 시각: ${bonusSuccessTime}\n1등 경쟁 시 해당 페이지의 인증이 필요할 수 있어!\n생각 있으면 사진 찍어두기!\n\n이제 나가서 [탈출]하고, 참가상 받자!`;
+    }
+
+    document.getElementById("next-button").addEventListener("click", showQuestion);
+    document.getElementById("final-button").addEventListener("click", showBonusScreen);
+    document.getElementById("roll-dice-button").addEventListener("click", rollDice);
+    document.getElementById("proceed-button").addEventListener("click", showFinalScreen);
+
+    showStartScreen();
+  });
+</script>
+</body>
+</html>
