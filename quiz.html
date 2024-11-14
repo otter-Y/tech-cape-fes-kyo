@@ -20,8 +20,18 @@
       background-position: center;
     }
 
-    /* 컨테이너 스타일 */
-    #quiz-container, #end-screen, #start-screen, #bonus-screen, #final-screen {
+    /* 보상 이미지 */
+    #final-image {
+      width: 200px;
+      height: 200px;
+      justify-content: center;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 컨테이너 */
+    #quiz-container, #end-screen, #start-screen, #bonus-screen, #final-screen, #guide-screen {
       background: rgba(255, 255, 255, 0.9);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       border-radius: 8px;
@@ -38,19 +48,21 @@
     }
 
     h2 { color: #333; margin-bottom: 10px; font-size: 24px; }
+    h3 { color: #CC0D19; margin-bottom: 10px; font-size: 24px; }
+    h4 { color: #333; margin-bottom: 10px; font-size: 20px; }
     #question { font-size: 18px; margin-bottom: 20px; color: #444; }
 
     .choice {
       background-color: #e0e4f1;
       color: #333;
       border: none;
-      padding: 12px 16px;
+      padding: 12px 15px;
       border-radius: 5px;
       margin: 5px 0;
       cursor: pointer;
       width: 100%;
       text-align: left;
-      font-size: 16px;
+      font-size: 15px;
       transition: background-color 0.3s;
     }
 
@@ -59,8 +71,14 @@
 
     .correct { color: green; font-weight: bold; }
     .incorrect { color: red; font-weight: bold; }
+    
+    #proceed-to-final-button:disabled {
+      background-color: #cccccc; /* 회색 */
+      cursor: not-allowed; /* 커서 변경 */
+    }
 
-/* 이름 입력 칸과 단답형 입력 칸 스타일 추가 */
+
+	/* 이름 입력 칸, 단답형 입력 칸 */
     #name-input, #short-answer {
       width: 80%;
       padding: 12px;
@@ -77,11 +95,9 @@
       box-shadow: 0 2px 8px rgba(0, 128, 0, 0.2);
     }
 
-    #feedback { margin-top: 10px; font-size: 16px; }
-
 
     #feedback { margin-top: 10px; font-size: 16px; }
-    #next-button, #roll-dice-button, #proceed-button {
+    #next-button, #roll-dice-button, #proceed-button, #proceed-to-final-button {
       background-color: #00B6FF;
       color: white;
       width: 70%;
@@ -95,6 +111,7 @@
       font-size: 16px;
       margin-top: 20px;
     }
+
 
     #next-button:hover, #roll-dice-button:hover, #proceed-button:hover { background-color: #00B6FF; }
     #score { font-weight: bold; color: #333; }
@@ -122,12 +139,13 @@
       cursor: pointer;
       font-size: 16px;
       transition: background-color 0.3s;
-
+    
 
     #start-button:hover, #final-button:hover { background-color: #00B6FF; }
   </style>
 </head>
 <body>
+
 
   <!-- 시작 화면 -->
   <div id="start-screen">
@@ -144,20 +162,19 @@
     <div id="choices"></div>
     <p id="feedback"></p>
     <p id="timer"></p>
-    <button id="next-button">다음 문제!</button>
+    <button id="next-button">다음 방으로!</button>
     <p>지나온 방 수: <span id="score">0</span>/5</p>
   </div>
 
 
-    <!-- 단답형 입력란과 제출 버튼 -->
+    <!-- 단답형 입력& 제출 버튼 -->
     <div class="input-container" style="display:none" id="short-answer-container">
       <input type="text" id="short-answer" placeholder="정답은 이쪽에 입력!">
       <button id="submit-button">제출!</button>
     </div>
 
 
-
-  <!-- 마지막 화면 -->
+  <!-- 퀴즈 끝난 화면 -->
   <div id="end-screen">
     <h2>C O N G R A T U L A T I O N !</h2>
     <p>모든 방을 탈출! 이제 마지막 미션만 남았어!</p>
@@ -175,17 +192,58 @@
     <button id="proceed-button" style="display: none;">마지막 안내는 이쪽!</button>
   </div>
 
+  <!-- 안내 페이지 -->
+  <div id="guide-screen" style="display: none;" class="container">
+    <h3>잠깐!! 일단 [탈출] 선언하고 와!!</h3>
+    <p>실제 시간은 [시작]과 [탈출] 선언으로 기록!</p>
+    <button id="proceed-to-final-button">하고 왔으면 클릭!</button>
+  </div>
+
   <!-- 최종 화면 -->
   <div id="final-screen">
-    <h2>마지막까지 고생했어!</h2>
+    <img id="final-image" src="" alt="애들 토큰" style="display: none;">
     <p id="final-message"></p>
+    <h4>탈출 고생했어! [참가상] 받아가!</h4>
   </div>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     let userName = "";
     let startTime = "";
     let bonusSuccessTime = "";
+
+    // 이름-이미지...... 28명 전부 추가 (힘낼 예정)
+    const nameImageMap = {
+      "시모코진 쿄": "쿄 토큰",
+      "카즈히로 루루카": "루루카 토큰",
+      "센논지 에칸": "에칸 토큰",
+      "아이조노 신쿠": "신쿠 토큰",
+      "하마치 루미": "루미 토큰",
+      "하코니와 하이네": "하이네 토큰",
+      "다이도우지 아사나": "아사나 토큰",
+      "칸온 에이치로": "에이치로 토큰",
+      "키사라기 에이야": "에이야 토큰",
+      "세츠카 미요": "미요 토큰",
+      "고바야시 치사": "치사 토큰",
+      "네코이시 마유": "마유 토큰",
+      "아리츠네 카즈마": "카즈마 토큰",
+      "요나카 케이": "케이 토큰",
+      "키다 키나": "키나 토큰",
+      "오토나시 준페이": "준페이 토큰",
+      "리 타오옌": "타오옌 토큰",
+      "요시자와 마시로": "마시로 토큰",
+      "쿠도 미키히로": "미키히로 토큰",
+      "토오메 유코": "유코 토큰",
+      "하야세 슌": "슌 토큰",
+      "레이코 츠네후미": "츠네후미 토큰",
+      "센보쿠야 코우가": "코우가 토큰",
+      "아이지마 코코네": "코코네 토큰",
+      "이노우에 아키오": "아키오 토큰",
+      "이바루마 신야": "신야 토큰",
+      "코교 소우마": "소우마 토큰",
+      "키리시마 사키": "사키 토큰",
+    };
 
     document.getElementById("name-input").addEventListener("input", () => {
       const nameInput = document.getElementById("name-input").value.trim();
@@ -198,34 +256,57 @@
       showQuizScreen();
     });
 
+
     const mainQuestions = [
-      { question: "객관식 문제 1", choices: ["보기 1", "보기 2", "보기 3", "정답"], answer: 3 },
-      { question: "객관식 문제 2", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
-      { question: "객관식 문제 3", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
-      // ... 총 29개의 문제
+      { question: "객관식 문제 1\n문제설명", choices: ["보기 1", "보기 2", "보기 3", "정답"], answer: 3 },
+      { question: "객관식 문제 2\n문제설명", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      { question: "객관식 문제 3\n문제설명", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
+      { question: "객관식 문제 4\n문제설명", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
+      { question: "객관식 문제 5\n문제설명", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      { question: "객관식 문제 6\n문제설명", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
+      // 객관식 부루마블 문제 추가...
     ];
 
     const finalQuestions = [
-      { question: "루루 3세 문제 1", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
-      { question: "루루 3세 문제 2", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
-      { question: "루루 3세 문제 3", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
-      // ... 총 10개의 마지막 문제
+      { question: "루루 3세 문제 1\n문제설명", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
+      { question: "루루 3세 문제 2\n문제설명", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
+      { question: "루루 3세 문제 3\n문제설명", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      // 루루 3세 문제 추가...
     ];
 
     const shortAnswerQuestion = [
-      { question: "단답형 문제 1", answer: "정답1" },
-      { question: "단답형 문제 2", answer: "정답2" },
-      // ... 총 10개의 단답형 문제
+      { question: "단답형 문제 1\n문제설명 ~ 정답은 정답1", answer: "정답1" },
+      { question: "단답형 문제 2\n문제설명 ~ 정답은 정답2", answer: "정답2" },
+      // 단답형 넌센스 문제 추가...
     ];
+    
+    const bonusQuestions = [
+      { question: "미션 1\n문제설명", requiredRoll: 50 },
+      { question: "미션 2\n문제설명", requiredRoll: 50 },
+      { question: "미션 3\n문제설명", requiredRoll: 50 },
+      { question: "미션 4\n문제설명", requiredRoll: 50 },
+      { question: "미션 5\n문제설명", requiredRoll: 50 },
+      // 미션 추가... 이거 70은 너무 오래걸리고 60이 적당한듯
+    ];
+    
 
     let score = 0;
     let currentQuestion = null;
     let penaltyTimer = null;
     let penaltyTimeLeft = 10;
+    let displayedQuestions = [];
 
     function getRandomQuestion() {
+      let randomIndex;
+
       if (score < 3) {
-        return mainQuestions[Math.floor(Math.random() * mainQuestions.length)];
+        do {
+          randomIndex = Math.floor(Math.random() * mainQuestions.length);
+        } while (displayedQuestions.includes(randomIndex));
+    
+        displayedQuestions.push(randomIndex);
+        return mainQuestions[randomIndex];
+
       } else if (score === 3) {
         return shortAnswerQuestion[Math.floor(Math.random() * shortAnswerQuestion.length)];
       } else {
@@ -295,6 +376,7 @@
         score++;
         document.getElementById("score").innerText = score;
         document.getElementById("next-button").style.display = "block";
+        document.getElementById("submit-button").style.display = "none";
       } else {
         document.getElementById("feedback").innerText = "땡! 10초 패널티야!";
         document.getElementById("feedback").classList = "incorrect";
@@ -350,14 +432,6 @@
       document.getElementById("end-screen").style.display = "block";
     }
 
-    // 미션 추가
-    const bonusQuestions = [
-      { question: "미션 1", requiredRoll: 50 },
-      { question: "미션 2", requiredRoll: 50 },
-      { question: "미션 3", requiredRoll: 50 },
-      { question: "미션 4", requiredRoll: 50 },
-      { question: "미션 5", requiredRoll: 50 },
-    ];
     let currentBonusQuestion = null;
     let bonusPenaltyTimer = null;
     let bonusPenaltyTimeLeft = 10;
@@ -383,11 +457,14 @@
       document.getElementById("dice-result").innerText = `주사위 결과: ${rollResult}`;
 
       if (rollResult >= currentBonusQuestion.requiredRoll) {
+        document.getElementById("dice-result").classList = "correct";
         document.getElementById("dice-result").innerText += " ::: 성공!\n탈출 성공이야!";
         document.getElementById("roll-dice-button").style.display = "none";
         document.getElementById("proceed-button").style.display = "block";
         bonusSuccessTime = new Date().toLocaleString();
+        document.getElementById("proceed-button").addEventListener("click", showGuideScreen);
       } else {
+        document.getElementById("dice-result").classList = "incorrect";
         document.getElementById("dice-result").innerText += " ::: 실패!\n10초 패널티!";
         startBonusPenalty();
       }
@@ -412,18 +489,47 @@
 
     function updateBonusTimer() {
       document.getElementById("bonus-timer").innerText = `남은 시간: ${bonusPenaltyTimeLeft}초`;
+      document.getElementById("feedback").classList = "incorrect";
+    }
+
+    function showGuideScreen() {
+      document.getElementById("bonus-screen").style.display = "none";
+      document.getElementById("guide-screen").style.display = "block";
+      document.getElementById("final-screen").style.display = "none";
+      
+      const proceedButton = document.getElementById("proceed-to-final-button");
+  proceedButton.disabled = true;
+ 
+     // 5초 동안 버튼 활성화
+      setTimeout(() => {
+      proceedButton.disabled = false;
+      }, 5000);
+      
     }
 
     function showFinalScreen() {
-      document.getElementById("bonus-screen").style.display = "none";
+      document.getElementById("guide-screen").style.display = "none";
       document.getElementById("final-screen").style.display = "block";
-      document.getElementById("final-message").innerText = `${userName}의 최종 기록은!\n\n입장 시각: ${startTime}\n탈출 시각: ${bonusSuccessTime}\n1등 경쟁 시 해당 페이지의 인증이 필요할 수 있어!\n생각 있으면 사진 찍어두기!\n\n이제 나가서 [탈출]하고, 참가상 받자!`;
+      document.getElementById("final-message").innerText = `${userName}의 최종 기록은!\n\n입장 시각: ${startTime}\n탈출 시각: ${bonusSuccessTime}\n\n이건 플레이 인증용 기록이라 실제 기록과는 달라!\n1등 경쟁 시 이 페이지 인증이 필요해!\n생각 있으면 사진 찍어두기!\n`;
+
+      // 애들 이름 나오면 알맞은 토큰 내뱉기
+      if (nameImageMap[userName]) {
+        const finalImage = document.getElementById("final-image");
+        finalImage.src = nameImageMap[userName];
+        finalImage.style.display = "block";
+      }
     }
 
     document.getElementById("next-button").addEventListener("click", showQuestion);
     document.getElementById("final-button").addEventListener("click", showBonusScreen);
     document.getElementById("roll-dice-button").addEventListener("click", rollDice);
-    document.getElementById("proceed-button").addEventListener("click", showFinalScreen);
+    document.getElementById("proceed-button").addEventListener("click", showGuideScreen);
+    document.getElementById("proceed-to-final-button").addEventListener("click", showFinalScreen);
+
+    // 시작 화면 표시
+    function showStartScreen() {
+      document.getElementById("start-screen").style.display = "block";
+    }
 
     showStartScreen();
   });
