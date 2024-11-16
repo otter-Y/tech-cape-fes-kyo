@@ -177,7 +177,7 @@
   <!-- 퀴즈 끝난 화면 -->
   <div id="end-screen">
     <h2>C O N G R A T U L A T I O N !</h2>
-    <p>모든 방을 탈출! 이제 마지막 미션만 남았어!</p>
+    <p>모든 방을 탈출! 이제 마지막 주사위 미션만 남았어!</p>
     <button id="final-button">주사위 데구르르</button>
   </div>
 
@@ -185,7 +185,7 @@
   <div id="bonus-screen">
     <h2>주사위 미션</h2>
     <p id="bonus-question">나가기 위해선 주사위를 굴려! 운에 맡겨!</p>
-    <p>주사위를 굴려서, <span id="required-number">50</span> 이상 나오면 성공!</p>
+    <p>[다이스]를 굴려서, <span id="required-number">50</span> 이상 나오면 성공!</p>
     <input type="number" id="bonus-input" placeholder="[다이스] 결과를 입력!">
     <button id="submit-bonus-button">제출!</button>
     <p id="bonus-feedback"></p>
@@ -259,35 +259,71 @@
 
 
     const mainQuestions = [
-      { question: "객관식 문제 1\n문제설명", choices: ["보기 1", "보기 2", "보기 3", "정답"], answer: 3 },
-      { question: "객관식 문제 2\n문제설명", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
-      { question: "객관식 문제 3\n문제설명", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
-      { question: "객관식 문제 4\n문제설명", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
-      { question: "객관식 문제 5\n문제설명", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
-      { question: "객관식 문제 6\n문제설명", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
-      // 객관식 부루마블 문제 추가...
+      { question: "Q. 다이도우지 아사나의 취미는?", choices: ["스도쿠", "쥐불놀이", "틱택토", "낱말풀이"], answer: 0 },
+      { question: "Q. 칸온 키이치로가 앨리스로 물리적 충격을 줄 수 있는 최대 거리는?", choices: ["10m", "20m", "30m", "40m"], answer: 3 },
+      { question: "Q. 키사라기 에이야가 착용하는 가면의 동물은?", choices: ["고양이", "강아지", "늑대", "여우"], answer: 2 },
+      { question: "Q. 고바야시 치사가 소속된 동아리는?", choices: ["검도부", "유도부", "죽도부", "다도부"], answer: 1 },
+      { question: "Q. 세츠카 미요의 별자리는?", choices: ["양자리", "쌍둥이자리", "처녀자리", "물병자리"], answer: 0 },
+      { question: "Q. 요나카 케이의 앨리스는?", choices: ["스도쿠 앨리스", "바쿠 앨리스", "바주카포 앨리스", "케이크 앨리스"], answer: 1 },
+      { question: "Q. 네코이시 마유가 입학한 나이는?", choices: ["3세", "7세", "9세", "11세"], answer: 3 },
+      { question: "Q. 아리츠네 카즈마가 최근 만드는 부정 형상의 형태는? ", choices: ["낙타", "고래", "고양이", "코끼리"], answer: 2 },
+      { question: "Q. 키다 키나가 고민할 때 두드리는 것은?", choices: ["입가", "눈가", "무릎", "허리"], answer: 0 },
+      { question: "Q. 센논지 에칸의 한국식 이름은?", choices: ["신민재", "석주명", "선윤재", "선유래"], answer: 3 },
+      { question: "Q. 시모쿄진 쿄가 1년 전 가을 개발한 새로운 인공지능의 이름은?", choices: ["시로", "미로", "쿠로", "주로"], answer: 2 },
+      { question: "Q. 아이조노 신쿠가 최근 자주 들고다니는 인형은?", choices: ["고슴도치 인형", "햄스터 인형", "생쥐 인형", "토끼 인형"], answer: 1 },
+      { question: "Q. 카즈히로 루루카가 착용하고 다니는 머리띠의 색상은", choices: ["검은색", "노란색", "파란색", "하얀색"], answer: 0 },
+      { question: "Q. 하코니와 하이네가 최근 관심 있는 게임 장르는?", choices: ["RPG", "로그라이크", "퍼즐", "타이쿤"], answer: 1 },
+      { question: "Q. 하마치 루미의 생일은?", choices: ["2월 24일", "2월 44일", "4월 2일", "4월 22일"], answer: 3 },
+      { question: "Q. 리 타오옌은 하루에 몇 끼를 먹을까?", choices: ["0.1끼", "3끼", "6끼", "10끼"], answer: 2 },
+      { question: "Q. 토오메 유코가 1000개 접기에 도전중인 것은?", choices: ["학접기", "별접기", "하트접기", "학알접기"], answer: 0 },
+      { question: "Q. 요시자와 마시로는 '이것' 알레르기가 있다.", choices: ["감자", "배추", "연근", "고구마"], answer: 3 },
+      { question: "Q. 쿠도 미키히로의 이전 장래희망은 '이것'이었다.", choices: ["카멜레온", "도마뱀", "공룡", "악어"], answer: 2 },
+      { question: "Q. 오토나시 준페이가 돌보고 있는 고슴도치의 이름은?", choices: ["하나짱", "하리짱", "하이짱", "리리짱"], answer: 1 },
+      { question: "Q. 레이코 츠네후미의 현재 취미는?", choices: ["와이어 공예", "리본 공예", "플라스틱 공예", "골판지 공예"], answer: 0 },
+      { question: "Q. 하야세 슌의 농구 포지션은?", choices: ["센터", "스몰 포워드", "빅 포워드", "포인트 가드"], answer: 1 },
+      { question: "Q. 아이지마 코코네는 ‘이것’을 배워서 할 수 있게 되었다.", choices: ["공부", "수용", "농구", "수영"], answer: 3 },
+      { question: "Q. 이노우에 아키오의 성씨 표기법은?", choices: ["上井", "井下", "井上", "井正"], answer: 2 },
+      { question: "Q. 센보쿠야 코우가가 밤마다 고통스러워 하는 이유는?", choices: ["성장통", "향수병", "흑역사", "낮에 다 하지 못한 잔소리가 생각남"], answer: 0 },
+      { question: "Q. 이바루마 신야가 현재 좋아하는 간식은?", choices: ["레몬 케이크", "초코 케이크", "마들렌 케이크", "몽블랑 케이크"], answer: 3 },
+      { question: "Q. 잠재능력반 텔레파시 앨리스 소우마의 성씨는?", choices: ["초교", "중교", "코교", "고교"], answer: 2 },
+      { question: "Q. 키리시마 사키의 앨리스는?", choices: ["절도", "절단", "단도", "초단"], answer: 1 },
+      // 객관식 부루마블 문제 입력 완료
     ];
 
     const finalQuestions = [
-      { question: "루루 3세 문제 1\n문제설명", choices: ["보기 1", "정답", "보기 3", "보기 4"], answer: 1 },
-      { question: "루루 3세 문제 2\n문제설명", choices: ["보기 1", "보기 2", "정답", "보기 4"], answer: 2 },
-      { question: "루루 3세 문제 3\n문제설명", choices: ["정답", "보기 2", "보기 3", "보기 4"], answer: 0 },
-      // 루루 3세 문제 추가...
+      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는?\n\n8+2=16106\n5+4=2091\n9+6=54153\n7+5=?", choices: ["보기 1", "35122", "보기 3", "보기 4"], answer: 1 },
+      { question: "<루루 3세 문제>\nQ. 아래는 무엇을 설명하고 있을까?\n\n5◎0 = 5\n2◎0 = 0\n2◎5 = 2", choices: ["보기 1", "보기 2", "가위바위보", "보기 4"], answer: 2 },
+      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는 무엇일까?\n\n16  06  68  88  ?  98", choices: ["87", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      { question: "<루루 3세 문제>\nQ. 기술반 학생이 당신에게 계산기와 종이를 주고 사라졌다.\n?에 들어가는 답은?\n\n963=1\n98563=9\n741852=11\n74125=?", choices: ["보기1", "보기 2", "보기 3", "6"], answer: 3 },
+      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는 뭘까?\n\n 7398 ▶ 5276 ▶ ?", choices: ["3140", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      // 루루 3세 문제 오답 추가 요망
     ];
 
     const shortAnswerQuestion = [
-      { question: "단답형 문제 1\n문제설명 ~ 정답은 정답1", answer: "정답1" },
-      { question: "단답형 문제 2\n문제설명 ~ 정답은 정답2", answer: "정답2" },
+      { question: "Q. 나무 병정이 불에 타면?\n\n힌트 : 여섯 글자", answer: "나무아미타불" },
+      { question: "Q. 포도가 수업에 결석하면?\n\n힌트 : 세 글자", answer: "포도쨈" },
+      { question: "Q. 칸온 키이치로를 끄면?\n\n힌트 : ", answer: "칸오프 키이치로" },
+      { question: "Q. 센보쿠야 코우가가 놀랄 때 하는 말은?\n\n힌트 : 앨리스와 연관 있음", answer: "언빌리버블" },
+      { question: "Q. 기름을 넣는데 며칠이 걸릴까?\n\n힌트 : ○일", answer: "5일" },
+      { question: "Q. 고바야시 치사가 아이들과 싸웠다. 왜 싸웠을까?\n\n힌트 : ○○해서", answer: "치사해서" },
+      { question: "Q. 하코니와 하이네가 앉으면?\n\n힌트 : 영어", answer: "하코니와 로우네" },
+      { question: "Q. 아이조노 신쿠가 자라면?\n\n힌트 : ○○○○ 신쿠", answer: "어른조노 신쿠" },
+      { question: "Q. 디즈니 랜드에서 환영하는 친구는 누굴까?\n\n힌트 : 디즈니 마스코트", answer: "쿠도 미키히로" },
+      { question: "Q. 아이지마 코코네가 성장하면?\n\n힌트 : ○○○○ 코코네", answer: "어른지마 코코네" },
+      { question: "Q. 키사라기 에이야의 동생 이름은?\n\n힌트 : 알파벳", answer: "키사라기 비야" },
+      { question: "Q. 소고기를 가장 좋아하는 친구는?\n\n힌트 : うまい!", answer: "코교 소우마" },
+      { question: "Q. 가장 뜨거운 과일은?\n\n힌트 : 다섯 글자", answer: "천도복숭아" },
+      { question: "Q. 매번 자원하는 학생은?\n\n힌트 : me", answer: "세츠카 미요" },
       // 단답형 넌센스 문제 추가...
     ];
     
     const bonusQuestions = [
-      { question: "미션 1\n문제설명", requiredRoll: 50 },
-      { question: "미션 2\n문제설명", requiredRoll: 50 },
-      { question: "미션 3\n문제설명", requiredRoll: 50 },
-      { question: "미션 4\n문제설명", requiredRoll: 50 },
-      { question: "미션 5\n문제설명", requiredRoll: 50 },
-      // 미션 추가... 이거 70은 너무 오래걸리고 60이 적당한듯
+      { question: "이런! 에칸이 나타났다!\n당장 에칸의 요리를 먹고 지나가자!", requiredRoll: 60 },
+      { question: "이런! 하이네가 나타났다!\n당장 하이네의 게임을 클리어하고 지나가자!", requiredRoll: 60 },
+      { question: "이런! 쿄가 나타났다!\n당장 '시로'랑 '쿠로'와 놀아주고 지나가자!", requiredRoll: 60 },
+      { question: "이런! 신쿠가 나타났다!\n당장 인형과 함께 놀아주고 지나가자!", requiredRoll: 60 },
+      { question: "이런! 루미가 나타났다!\n당장 주변에 떨어진 쓰레기를 줍고 지나가자!", requiredRoll: 60 },
+      { question: "이런! 루루카가 나타났다!\n당장 화학 문제를 풀어서 지나가자!", requiredRoll: 60 },
     ];
     
 
@@ -562,8 +598,6 @@
     function updateBonusTimer() {
       document.getElementById("bonus-timer").innerText = `남은 시간: ${bonusPenaltyTimeLeft}초`;
     }
-
-
 
     document.getElementById("next-button").addEventListener("click", showQuestion);
     document.getElementById("final-button").addEventListener("click", showBonusScreen);
