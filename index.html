@@ -291,11 +291,11 @@
     ];
 
     const finalQuestions = [
-      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는?\n\n8+2=16106\n5+4=2091\n9+6=54153\n7+5=?", choices: ["보기 1", "35122", "보기 3", "보기 4"], answer: 1 },
-      { question: "<루루 3세 문제>\nQ. 아래는 무엇을 설명하고 있을까?\n\n5◎0 = 5\n2◎0 = 0\n2◎5 = 2", choices: ["보기 1", "보기 2", "가위바위보", "보기 4"], answer: 2 },
-      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는 무엇일까?\n\n16  06  68  88  ?  98", choices: ["87", "보기 2", "보기 3", "보기 4"], answer: 0 },
-      { question: "<루루 3세 문제>\nQ. 기술반 학생이 당신에게 계산기와 종이를 주고 사라졌다.\n?에 들어가는 답은?\n\n963=1\n98563=9\n741852=11\n74125=?", choices: ["보기1", "보기 2", "보기 3", "6"], answer: 3 },
-      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는 뭘까?\n\n 7398 ▶ 5276 ▶ ?", choices: ["3140", "보기 2", "보기 3", "보기 4"], answer: 0 },
+      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는?\n\n8+2=16106\n5+4=2091\n9+6=54153\n7+5=?", answer: "35122" },
+      { question: "<루루 3세 문제>\nQ. 아래는 무엇을 설명하고 있을까?\n\n5◎0 = 5\n2◎0 = 0\n2◎5 = 2", answer: "가위바위보" },
+      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는 무엇일까?\n\n16  06  68  88  ?  98", answer: "87" },
+      { question: "<루루 3세 문제>\nQ. 기술반 학생이 당신에게 계산기와 종이를 주고 사라졌다.\n?에 들어가는 답은?\n\n963=1\n98563=9\n741852=11\n74125=?", answer: "6" },
+      { question: "<루루 3세 문제>\nQ. ?에 들어갈 숫자는 뭘까?\n\n 7398 ▶ 5276 ▶ ?", answer: "3140" },
       // 루루 3세 문제 오답 추가 요망
     ];
 
@@ -407,6 +407,10 @@
 
     function checkShortAnswer() {
       const userAnswer = document.getElementById("short-answer").value.trim();
+       if (score >= 4) {
+         showEndScreen();
+       }
+
       if (userAnswer === currentQuestion.answer) {
         document.getElementById("feedback").innerText = "딩동댕!";
         document.getElementById("feedback").classList = "correct";
