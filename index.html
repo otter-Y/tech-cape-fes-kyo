@@ -79,7 +79,7 @@
 
 
 	/* 이름 입력 칸, 단답형 입력 칸 */
-    #name-input, #short-answer {
+    #name-input, #short-answer, #bonus-input {
       width: 80%;
       padding: 12px;
       border: 1px solid #ccc;
@@ -130,7 +130,7 @@
     }
 
   /* 제출 버튼 스타일 */
-    #submit-button {
+    #submit-button, #submit-bonus-button {
       background-color: #00B6FF;
       color: white;
       padding: 10px 16px;
@@ -139,7 +139,7 @@
       cursor: pointer;
       font-size: 16px;
       transition: background-color 0.3s;
-    
+    }
 
     #start-button:hover, #final-button:hover { background-color: #00B6FF; }
   </style>
@@ -186,8 +186,9 @@
     <h2>주사위 미션</h2>
     <p id="bonus-question">나가기 위해선 주사위를 굴려! 운에 맡겨!</p>
     <p>주사위를 굴려서, <span id="required-number">50</span> 이상 나오면 성공!</p>
-    <button id="roll-dice-button">주사위 데굴데굴</button>
-    <p id="dice-result"></p>
+    <input type="number" id="bonus-input" placeholder="[다이스] 결과를 입력!">
+    <button id="submit-bonus-button">제출!</button>
+    <p id="bonus-feedback"></p>
     <p id="bonus-timer"></p>
     <button id="proceed-button" style="display: none;">마지막 안내는 이쪽!</button>
   </div>
@@ -520,11 +521,55 @@
       }
     }
 
+    function checkBonusInput() {
+      const input = parseInt(document.getElementById("bonus-input").value, 10);
+      const required = currentBonusQuestion.requiredRoll;
+
+      if (!isNaN(input) && input >= required) {
+        // 성공
+        document.getElementById("bonus-feedback").innerText = "탈출 성공!";
+        document.getElementById("bonus-feedback").className = "correct";
+        document.getElementById("submit-bonus-button").disabled = true;
+        document.getElementById("submit-bonus-button").style.display = "none";
+        document.getElementById("proceed-button").style.display = "block";
+        bonusSuccessTime = new Date().toLocaleString();
+      } else {
+        // 실패
+        document.getElementById("bonus-feedback").innerText = `땡!!\n${required} 이상이 나와야 통과야!\n10초 패널티 받고 다시 [다이스] 굴리고 와!`;
+        document.getElementById("bonus-feedback").className = "incorrect";
+        startBonusPenalty();
+      }
+    }
+
+    function startBonusPenalty() {
+      const submitButton = document.getElementById("submit-bonus-button");
+      submitButton.disabled = true; // 입력 불가
+      bonusPenaltyTimeLeft = 10;
+      updateBonusTimer();
+
+      bonusPenaltyTimer = setInterval(() => {
+        bonusPenaltyTimeLeft--;
+        updateBonusTimer();
+
+        if (bonusPenaltyTimeLeft <= 0) {
+          clearInterval(bonusPenaltyTimer);
+          submitButton.disabled = false; // 입력 가능
+          document.getElementById("bonus-timer").innerText = "";
+        }
+      }, 1000);
+    }
+
+    function updateBonusTimer() {
+      document.getElementById("bonus-timer").innerText = `남은 시간: ${bonusPenaltyTimeLeft}초`;
+    }
+
+
+
     document.getElementById("next-button").addEventListener("click", showQuestion);
     document.getElementById("final-button").addEventListener("click", showBonusScreen);
-    document.getElementById("roll-dice-button").addEventListener("click", rollDice);
     document.getElementById("proceed-button").addEventListener("click", showGuideScreen);
     document.getElementById("proceed-to-final-button").addEventListener("click", showFinalScreen);
+    document.getElementById("submit-bonus-button").addEventListener("click", checkBonusInput);
 
     // 시작 화면 표시
     function showStartScreen() {
